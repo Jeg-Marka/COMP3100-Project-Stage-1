@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 public class CSjobDispatch {
     public static void main(String[] args) {
         try {
-            Socket s = new Socket("127.0.0.1", 50000);
+            Socket sock = new Socket("127.0.0.1", 50000);
 
-            DataOutputStream output = new DataOutputStream(s.getOutputStream());
-            BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            DataOutputStream output = new DataOutputStream(sock.getOutputStream());
+            BufferedReader input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
             output.write(("HELO\n").getBytes());
             output.flush();
@@ -148,7 +148,7 @@ public class CSjobDispatch {
 
                 input.close();
                 output.close();
-                s.close();
+                sock.close();
 
             }
         } catch (Exception e) {
