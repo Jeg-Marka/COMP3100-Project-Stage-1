@@ -11,6 +11,8 @@ public class CSjobDispatch {
             DataOutputStream output = new DataOutputStream(sock.getOutputStream());
             BufferedReader input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
+            boolean exitQ = false;
+
             output.write(("HELO\n").getBytes());
             output.flush();
             System.out.println("SENT: HELO");
@@ -43,90 +45,91 @@ public class CSjobDispatch {
             System.out.println("RCVD: " + rcvd);
 
             String[] job = rcvd.split(" ");
-            jID = Integer.parseInt(job[2]);
 
-            output.write(("GETS All\n").getBytes());
-            output.flush();
-            System.out.println("SENT: GETS All");
+            if (job[0].equals("JOBN")) {
+                jID = Integer.parseInt(job[2]);
 
-            rcvd = (String) input.readLine();
-            System.out.println("RCVD: " + rcvd);
+                output.write(("GETS All\n").getBytes());
+                output.flush();
+                System.out.println("SENT: GETS All");
 
-            String[] srvData = rcvd.split(" ");
-            nServers = Integer.parseInt(srvData[1]);
-            System.out.println("No. Of Servers: " + nServers);
-
-            output.write(("OK\n").getBytes());
-            output.flush();
-            System.out.println("SENT: OK");
-
-            // Determines Maxium Server Size and Count of the server
-            int maxCore = 0;
-            String maxServer = "Undetermined";
-            int msCount = 0;
-
-            for (int i = 0; i < nServers; i++) {
                 rcvd = (String) input.readLine();
                 System.out.println("RCVD: " + rcvd);
-                String[] srvInfo = rcvd.split(" ");
-                sSize = srvInfo[0];
-                sCore = Integer.parseInt(srvInfo[4]);
 
-                if (sCore > maxCore) {
-                    maxServer = sSize;
-                    maxCore = sCore;
-                    msCount = 0;
-                }
-                msCount++;
-            }
+                String[] srvData = rcvd.split(" ");
+                nServers = Integer.parseInt(srvData[1]);
+                System.out.println("No. Of Servers: " + nServers);
 
-            System.out.println("Largest Server: " + maxServer + " Count: " + msCount);
+                output.write(("OK\n").getBytes());
+                output.flush();
+                System.out.println("SENT: OK");
 
-            output.write(("OK\n").getBytes());
-            output.flush();
-            System.out.println("SENT: OK");
+                // Determines Maxium Server Size and Count of the server
+                int maxCore = 0;
+                String maxServer = "Undetermined";
+                int msCount = 0;
 
-            boolean exitQ = false;
-
-            rcvd = (String) input.readLine();
-            System.out.println("RCVD: " + rcvd);
-            while (jobQ.equals("NONE") == false) {
-                for (int i = 0; i < msCount && jobQ.equals("NONE") == false; i++) {
-                    output.write(("REDY\n").getBytes());
-                    output.flush();
-                    System.out.println("SENT: redy");
-
+                for (int i = 0; i < nServers; i++) {
                     rcvd = (String) input.readLine();
                     System.out.println("RCVD: " + rcvd);
+                    String[] srvInfo = rcvd.split(" ");
+                    sSize = srvInfo[0];
+                    sCore = Integer.parseInt(srvInfo[4]);
 
-                    job = rcvd.split(" ");
-                    jobQ = job[0];
+                    if (sCore > maxCore) {
+                        maxServer = sSize;
+                        maxCore = sCore;
+                        msCount = 0;
+                    }
+                    msCount++;
+                }
 
-                    if (jobQ.equals("JOBN")) {
-                        jID = Integer.parseInt(job[2]);
+                System.out.println("Largest Server: " + maxServer + " Count: " + msCount);
 
-                        output.write(("SCHD " + jID + " " + maxServer + " " + i + "\n").getBytes());
+                output.write(("OK\n").getBytes());
+                output.flush();
+                System.out.println("SENT: OK");
+
+                rcvd = (String) input.readLine();
+                System.out.println("RCVD: " + rcvd);
+                while (jobQ.equals("NONE") == false) {
+                    for (int i = 0; i < msCount && jobQ.equals("NONE") == false; i++) {
+                        output.write(("REDY\n").getBytes());
                         output.flush();
-                        System.out.println("SCHD: " + jID + " TO: " + maxServer + " " + i);
+                        System.out.println("SENT: redy");
+
                         rcvd = (String) input.readLine();
                         System.out.println("RCVD: " + rcvd);
-                    } else if (jobQ.equals("JCPL")) {
-                        i--;
-                    } else if (jobQ.equals("NONE")) {
-                        output.write(("OK\n").getBytes());
-                        output.flush();
-                        System.out.println("SENT: OK");
 
-                        rcvd = (String) input.readLine();
-                        System.out.println("RCVD: " + rcvd);
+                        job = rcvd.split(" ");
+                        jobQ = job[0];
 
-                        output.write(("QUIT\n").getBytes());
-                        output.flush();
-                        System.out.println("SENT: q");
+                        if (jobQ.equals("JOBN")) {
+                            jID = Integer.parseInt(job[2]);
 
-                        rcvd = (String) input.readLine();
-                        System.out.println("RCVD: " + rcvd);
-                        exitQ = true;
+                            output.write(("SCHD " + jID + " " + maxServer + " " + i + "\n").getBytes());
+                            output.flush();
+                            System.out.println("SCHD: " + jID + " TO: " + maxServer + " " + i);
+                            rcvd = (String) input.readLine();
+                            System.out.println("RCVD: " + rcvd);
+                        } else if (jobQ.equals("JCPL")) {
+                            i--;
+                        } else if (jobQ.equals("NONE")) {
+                            output.write(("OK\n").getBytes());
+                            output.flush();
+                            System.out.println("SENT: OK");
+
+                            rcvd = (String) input.readLine();
+                            System.out.println("RCVD: " + rcvd);
+
+                            output.write(("QUIT\n").getBytes());
+                            output.flush();
+                            System.out.println("SENT: q");
+
+                            rcvd = (String) input.readLine();
+                            System.out.println("RCVD: " + rcvd);
+                            exitQ = true;
+                        }
                     }
                 }
             }
