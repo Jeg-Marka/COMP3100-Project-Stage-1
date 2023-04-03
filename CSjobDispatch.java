@@ -115,16 +115,10 @@ public class CSjobDispatch {
                         } else if (jobQ.equals("JCPL")) {
                             i--;
                         } else if (jobQ.equals("NONE")) {
-                            output.write(("OK\n").getBytes());
-                            output.flush();
-                            System.out.println("SENT: OK");
-
-                            rcvd = (String) input.readLine();
-                            System.out.println("RCVD: " + rcvd);
 
                             output.write(("QUIT\n").getBytes());
                             output.flush();
-                            System.out.println("SENT: q");
+                            System.out.println("SENT: QUIT");
 
                             rcvd = (String) input.readLine();
                             System.out.println("RCVD: " + rcvd);
@@ -135,16 +129,10 @@ public class CSjobDispatch {
             }
 
             if (exitQ = false) {
-                output.write(("OK\n").getBytes());
-                output.flush();
-                System.out.println("SENT: OK");
-
-                rcvd = (String) input.readLine();
-                System.out.println("RCVD: " + rcvd);
 
                 output.write(("QUIT\n").getBytes());
                 output.flush();
-                System.out.println("SENT: q");
+                System.out.println("SENT: QUIT");
 
                 rcvd = (String) input.readLine();
                 System.out.println("RCVD: " + rcvd);
