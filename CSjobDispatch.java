@@ -22,7 +22,7 @@ public class CSjobDispatch {
 
             // Job Info
             String jobQ = "";
-            int jID = 0;
+            int jID = -10;
 
             // server info
             String sSize = "";
@@ -39,13 +39,14 @@ public class CSjobDispatch {
 
             output.write(("REDY\n").getBytes()); // sends REDY msg to the server
             output.flush();
-            System.out.println("SENT: redy");
+            System.out.println("SENT: REDY");
 
             rcvd = (String) input.readLine(); // reads msg from the server
-            System.out.println("RCVD: " + rcvd);
+            System.out.println("RCVD JOB: " + rcvd);
 
             String[] job = rcvd.split(" "); //splits last msg from the server into a string array for each word
 
+            jobQ = job[0]; //sets jobq to inital server msg
             if (job[0].equals("JOBN")) { //checks to see that the server has sent a JOB 
                 jID = Integer.parseInt(job[2]); //grabs the JOB ID from the last server msg
 
@@ -87,29 +88,20 @@ public class CSjobDispatch {
                     }
                 }
 
-                System.out.println("Largest Server: " + maxServer + " Count: " + msCount);
-
                 output.write(("OK\n").getBytes()); // sends ok msg to the srv
                 output.flush();
                 System.out.println("SENT: OK");
 
                 rcvd = (String) input.readLine(); // reads msg from the server 
                 System.out.println("RCVD: " + rcvd);
+
+                System.out.println(jID);
+
                 while (jobQ.equals("NONE") == false) { //while loop that tests to see if last message from the srv recived was NONE
-                    for (int i = 0; i < msCount && jobQ.equals("NONE") == false; i++) { //for loop that continues for the count of max servers and tests to see if last message from the srv recived was NONE
-                        output.write(("REDY\n").getBytes()); // sends REDY msg to the server to recive new JOB
-                        output.flush();
-                        System.out.println("SENT: redy");
-
-                        rcvd = (String) input.readLine(); // reads msg from the server 
-                        System.out.println("RCVD: " + rcvd);
-
-                        job = rcvd.split(" ");  //splits last msg from the server into a string array for each word
-                        jobQ = job[0]; //sets jobq to inital server msg
-
+                    for (int i = 0; i < msCount && exitQ == false; i++) { //for loop that continues for the count of max servers and tests to see if last message from the srv recived was NONE
                         if (jobQ.equals("JOBN")) { //checks if MSG is a JOB
                             jID = Integer.parseInt(job[2]); //grabs JOB ID from last recicved msg
-
+                            
                             output.write(("SCHD " + jID + " " + maxServer + " " + i + "\n").getBytes()); //builds schedule job command based on JOB ID and Chosen server
                             output.flush();
                             System.out.println("SCHD: " + jID + " TO: " + maxServer + " " + i);
@@ -127,11 +119,23 @@ public class CSjobDispatch {
                             System.out.println("RCVD: " + rcvd);
                             exitQ = true; //sets exitq to true to prevent a second exit attempt
                         }
+
+                        if (exitQ == false) {
+                            output.write(("REDY\n").getBytes()); // sends REDY msg to the server to recive new JOB
+                            output.flush();
+                            System.out.println("SENT: REDY");
+
+                            rcvd = (String) input.readLine(); // reads msg from the server 
+                            System.out.println("RCVD: " + rcvd);
+
+                            job = rcvd.split(" ");  //splits last msg from the server into a string array for each word
+                            jobQ = job[0]; //sets jobq to inital server msg
+                        }
                     }
                 }
             }
 
-            if (exitQ = false) { //checks if  server has exited while loop without setting exitQ to true
+            if (exitQ == false) { //checks if  server has exited while loop without setting exitQ to true
                 //this is for redundancy would only be nesacary if the for loop exited and the next msg from the server was NONE 
                 output.write(("QUIT\n").getBytes()); //Sends QUIT command to the server
                 output.flush();
