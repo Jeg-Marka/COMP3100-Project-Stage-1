@@ -1,9 +1,10 @@
+package Archive;
 import java.net.Socket;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 
-public class GetsCapaableDispatch {
+public class CSjobDispatch {
     public static void main(String[] args) {
         try {
             Socket sock = new Socket("127.0.0.1", 50000); //opens up a conection to the default port for the DS Sim server
@@ -23,9 +24,6 @@ public class GetsCapaableDispatch {
             // Job Info
             String jobQ = "";
             int jID = -10;
-            int jcore = 0;
-            int jsize = 0;
-            int jspeed = 0;
 
             // server info
             String sSize = "";
@@ -52,13 +50,10 @@ public class GetsCapaableDispatch {
             jobQ = job[0]; //sets jobq to inital server msg
             if (job[0].equals("JOBN")) { //checks to see that the server has sent a JOB 
                 jID = Integer.parseInt(job[2]); //grabs the JOB ID from the last server msg
-                jcore = Integer.parseInt(job[4]);
-                jsize = Integer.parseInt(job[5]);
-                jspeed = Integer.parseInt(job[6]);
 
-                output.write(("GETS Capable " + jcore + " " + jsize  + " " +  jspeed + "\n").getBytes()); //sends GETS ALL message to the server to request stored server data
+                output.write(("GETS All\n").getBytes()); //sends GETS ALL message to the server to request stored server data
                 output.flush();
-                System.out.println("SENT: GETS Capable " + jcore + " " + jsize  + " " +  jspeed);
+                System.out.println("SENT: GETS All");
 
                 rcvd = (String) input.readLine();  // reads msg from the server
                 System.out.println("RCVD: " + rcvd);
@@ -133,10 +128,9 @@ public class GetsCapaableDispatch {
 
                             rcvd = (String) input.readLine(); // reads msg from the server 
                             System.out.println("RCVD: " + rcvd);
-                            if (rcvd != null & !rcvd.isEmpty()){
-                                job = rcvd.split(" ");  //splits last msg from the server into a string array for each word
-                                jobQ = job[0]; //sets jobq to inital server msg
-                            }
+
+                            job = rcvd.split(" ");  //splits last msg from the server into a string array for each word
+                            jobQ = job[0]; //sets jobq to inital server msg
                         }
                     }
                 }
